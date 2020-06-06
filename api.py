@@ -1,14 +1,15 @@
-import falcon, logging
+import falcon, logging, pdb
 
 # Logging
-logging.basicConfig(filename = 'api.log', level=logging.DEBUG)
+#logging.basicConfig(filename = 'api.log')
+logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s')
 
 # Load Config
 import loadconfig
 
 # Initialize API
-app = falcon.API()
+app = falcon.App()
 
 # Views
 import views
