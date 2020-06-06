@@ -1,0 +1,5 @@
+Cython==0.29.19
+falcon==2.0.0
+hupper==1.10.2
+pathtools==0.1.2
+watchdog==0.10.2
