@@ -1,26 +1,33 @@
-import falcon, logging, pdb
+"""CYBEXP API."""
 
-# Logging
-#logging.basicConfig(filename = 'api.log')
-logging.basicConfig(level=logging.DEBUG)
-logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s')
+import falcon
+import logging
 
-# Load Config
-import loadconfig
+### Logging
+#logging.basicConfig(filename = 'api.log') 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)s %(filename)s:%(lineno)s' \
+    ' - %(funcName)() --  %(message)s'
+    )
 
-# Initialize API
+
+### Initialize API
 app = falcon.App()
 
-# Views
+
+### Views
 import views
 
-# Routes
+
+### Routes
 app.add_route('/query', views.Query())
 app.add_route('/raw', views.Raw())
 
 
-# Test Windows >> hupper -m api
-from wsgiref import simple_server
-if __name__ == '__main__':
-  httpd = simple_server.make_server('127.0.0.1', 5000, app)
-  httpd.serve_forever()
+### Test Windows >> hupper -m api
+import os
+if __name__ == '__main__' and os.name == 'nt':
+    from wsgiref import simple_server
+    httpd = simple_server.make_server('127.0.0.1', 5000, app)
+    httpd.serve_forever()
