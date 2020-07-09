@@ -8,6 +8,7 @@ from . import crypto
 
 class Raw(object):
     file_entries, fs = loadconfig.get_cache_db()
+    r = file_entries.create_index("timestamp")
 
     def on_post(self, req, resp):
         try:
@@ -20,14 +21,14 @@ class Raw(object):
                 if part.name == 'file':
                     fenc = crypto.encrypt_file(part.stream.read())
                     info['fid'] = self.fs.put(fenc, filename=part.filename)
-                elif part.name in ['typetag', 'name', 'orgid', 'timezone']:
+                elif part.name in ['typetag', 'name', 'orgid', 'timezone','config_hash']:
                     info[part.name] = part.text
                 else:
                     resp.media = {"message": "Invalid input: " + part.name}
                     resp.status = falcon.HTTP_400
                     return
 
-            required_keys = ['typetag', 'name', 'orgid', 'timezone', 'fid']
+            required_keys = ['typetag', 'name', 'orgid', 'timezone', 'fid']#,'config_hash']
             if not all(key in info for key in required_keys):
                 resp.media = {"message": "Incomplete input"}
                 resp.status = falcon.HTTP_400
