@@ -88,7 +88,7 @@ class TokenManager(object):
                 if payload:
                     user = self.hash_to_user(payload["_hash"])
 
-                    # kwargs["user_object"] = user
+                    kwargs["user_object"] = user
 
                     r = func(self, req, resp, *args,**kwargs)
                     return r
