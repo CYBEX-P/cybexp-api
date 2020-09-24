@@ -92,7 +92,7 @@ class Query:
                 resp.media = {"message":"check back later", "status":"processing"}
     
         except:
-            logging.exception("api.views.query.Query")
+            logging.error("api.views.query.Query", exc_info=True)
             resp.media = {"message":"Server Error!"}
             resp.status = falcon.HTTP_500
     
