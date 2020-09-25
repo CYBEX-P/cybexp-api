@@ -34,12 +34,19 @@ class TokenManager(object):
         except:
             return None
 
-    def hash_to_user(self, usr_hash):
-        raw_user = self.ident_backend.find_one({"_hash": usr_hash},{"_id":0})
-        if raw_user:
-            user = parse(raw_user, self.ident_backend)
-            return user
+
+    def hash_to_object(self, obj_hash):
+        raw_obj = self.ident_backend.find_one({"_hash": obj_hash},{"_id":0})
+        if raw_obj:
+            obj = parse(raw_obj, self.ident_backend)
+            return obj
         return None
+
+    def hash_to_user(self, usr_hash):
+        return self.hash_to_object(user_hash)
+
+    def hash_to_org(self, org_hash):
+        return self.hash_to_object(user_hash)
 
     def _is_token_revoked(self,token):
         # raise Exception("todo check token revoked")
@@ -52,28 +59,16 @@ class TokenManager(object):
             named argument `request_data` must be passed in to original function
             or @_extract_request_data() must be called before hand.
             this decorator will get the token from request_data["token"].
+            this decorator will place the user's tahoe object under the names argument `user_object`.
         Usage
         -----
         @_extract_request_data()
         @_validate_token
-        def some_func(self, req, resp):
-            pass
+        def some_func(self, req, resp, **kwargs):
+            request_data = kwargs["request_data"]
+            user_object = kwargs["user_object"]
         '''
         def wrapper(self, req, resp, *args, **kwargs):
-
-            # req = kwargs["req"]
-            # resp = kwargs["resp"]
-
-            # try:
-            #     request_data = {}
-            #     request_data['req_timestamp'] = time.time()
-            #     for part in req.media:
-            #         request_data[part.name] = part.text
-
-            # except falcon.errors.HTTPBadRequest as err:
-            #       resp.media = {"message" : "Invalid input! " +
-            #                     repr(err) + str(err)}
-            #       resp.status = falcon.HTTP_400
 
             try:
                 request_data = kwargs["request_data"]
@@ -84,9 +79,14 @@ class TokenManager(object):
                     resp.status = falcon.HTTP_401
                     return
 
-                payload = self.get_payload(token)
+                payload = self.get_payload(token) # if valid therefore there exists valid user
                 if payload:
                     user = self.hash_to_user(payload["_hash"])
+
+                    if user == None:
+                        resp.media = {"message": "User does not exist"}
+                        resp.status = falcon.HTTP_409
+                        return
 
                     kwargs["user_object"] = user
 
@@ -104,7 +104,53 @@ class TokenManager(object):
 
         return wrapper
 
-    def _extract_request_data(required_fields:list=[]):
+    def _get_org_object(func):
+        '''checks if key `org_hash` is in the names argument `request_data`. If it fails it returns 400. 
+            named argument `request_data` must be passed in to original function
+            or @_extract_request_data() must be called before hand.
+            this decorator will get the `org_hash` from request_data["org_hash"].
+            this decorator will place the orgs tahoe object under the names argument `org_object`.
+        Usage
+        -----
+        @_extract_request_data()
+        @_get_org_object
+        def some_func(self, req, resp, **kwargs):
+            request_data = kwargs["request_data"]
+            org_object = kwargs["org_object"]
+            pass
+        '''
+        def wrapper(self, req, resp, *args, **kwargs):
+
+            try:
+                try:
+                    request_data = kwargs["request_data"]
+                    org_hash = request_data["org_hash"]
+                except:
+                    # traceback.print_exc()
+                    resp.media = {"message": "Missind org_hash"}
+                    resp.status = falcon.HTTP_400
+                    return
+
+                org = self.hash_to_org(org_hash)
+                if org == None:
+                        resp.media = {"message": "Org does not exist"}
+                        resp.status = falcon.HTTP_409
+                        return
+
+                kwargs["org_object"] = org
+
+                r = func(self, req, resp, *args,**kwargs)
+                return r
+                
+            except:
+                # traceback.print_exc()
+                resp.media = {"message": "Server Error!"}
+                resp.status = falcon.HTTP_500
+                return
+
+        return wrapper
+
+    def _extract_request_data(*args_main, **kwrgs_main):
         '''This decorator grab the data from the falcon request object and pass it
             into the original function as a named argument named `request_data`.
             This decorator can also enforce fields in the request, add them to `required _fields` decorator argument.
@@ -115,6 +161,13 @@ class TokenManager(object):
         This decorator must be called `@_extract_request_data()`, if only wanting to extract only and not enforce ( use the parenthesis). 
         Or `@_extract_request_data(required_fields=["email", "password"])` if wanting to enforce fields.
         '''
+        
+        print("args test:", args_main)
+        print("kwargs test", kwrgs_main)
+        required_fields = kwrgs_main.pop("required_fields", [])
+        print("req", required_fields)
+        
+
         def decorator_wrapper(func):
             def wrapper(self, req, resp, *args, **kwargs):
                 print("w:", req, resp)
@@ -308,6 +361,7 @@ class TokenManager(object):
                              "email": request_data["email"],
                              "token":user.token}
                 resp.status = falcon.HTTP_201
+                return
 
             else: # user exists
                 resp.media = {"message" : "User already exists"}
@@ -319,10 +373,73 @@ class TokenManager(object):
             resp.status = falcon.HTTP_500
             return
 
+
+    @_extract_request_data(required_fields=["orgname", "user","admin","name"])
     @_validate_token
-    def addOrg(self, req, resp, **kwargs):
+    def addOrg(self, req, resp, request_data, user_object, **kwargs):
         raise Exception("TODO; add org not implemented")
-        pass
+        
+        if not all(isinstance(request_data[k], list) for k in ["user", "admin"]):
+            resp.media = {"message" : "'user' and 'admin' must be a list containing user hashses"}
+            resp.status = falcon.HTTP_400
+            return
+
+        try:
+            if not self.ident_backend.org_exists(request_data["orgname"]):
+                org = Org(
+                                orgname=request_data["orgname"],
+                                user=request_data["user"],
+                                admin=request_data["admin"],
+                                name=request_data["name"]
+                                # _backend=self.ident_backend
+                           )
+
+                resp.media = {
+                                "message" : "Created",
+                                "orgname" : request_data["orgname"],
+                                "user" : request_data["user"],
+                                "admin" : request_data["admin"],
+                                "name" : request_data["name"],
+                                "org_hash" : org._hash
+                            }
+                resp.status = falcon.HTTP_201
+                return
+
+            else: # user exists
+                resp.media = {"message" : "Organization already exists"}
+                resp.status = falcon.HTTP_409
+                return
+        except:
+            traceback.print_exc()
+            resp.media = {"message" : "Server Error"}
+            resp.status = falcon.HTTP_500
+            return
+
+
+    # @_extract_request_data(required_fields=["orgname", "acl"])
+    # @_validate_token
+    # @_get_org_object
+    # def change_org_acl(self, req, resp, request_data, user_object, org_object, **kwargs):
+
+    #     try:
+    #         org_object.set_acl()
+    #     except TypError:
+    #         resp.media = {"message" : "ACL must be a list of user hashses"}
+    #         resp.status = falcon.HTTP_400
+    #         return
+
+    #     #if admin for org; do it
+
+
+    # @_extract_request_data()
+    # @_validate_token
+    # def orgs_i_belong(self, req, resp, **kwargs):
+    #     pass
+
+    # @_extract_request_data()
+    # @_validate_token
+    # def orgs_i_admin(self, req, resp, **kwargs):
+    #     pass
 
 
 

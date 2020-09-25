@@ -1,5 +1,8 @@
 """api.loadconfig"""
 
+import sys
+sys.path.insert(1, '/home/nacho/Projects/tahoe0.7-dev/')
+
 import gridfs
 import json
 import logging
@@ -33,7 +36,7 @@ def get_config():
             config = json.load(f)
     except FileNotFoundError:
         config = default
-        logging.warning("No config file found, using default config")
+#        logging.warning("No config file found, using default config")
     except json.decoder.JSONDecodeError:
         logging.error("Bad configuration file!", exc_info=True)
         sys.exit(1) # 1 = error in linux
