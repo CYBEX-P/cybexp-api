@@ -38,9 +38,8 @@ class Query:
       
             canonical_data = canonical(query_data).encode()
             encrypted_data = str(encrypt_file(canonical_data))
-      
-            query = TDQL(query_type, query_data, userid, time.time())
-            query._update({'data' : {'encrypted_data': encrypted_data}})
+            
+            query = TDQL(query_type, encrypted_data, userid, time.time())
           
             if query.status == 'ready':
                 report = self.report_backend.find_one(
@@ -51,13 +50,14 @@ class Query:
               
             elif query.status == 'processing':
                 resp.status = falcon.HTTP_202
-                resp.media = {"message":"check back later", "status":"processing"}
-                #{"message" : "Please check back later on report_url", "report_url" : "/query/" + query.uuid}
+                resp.media = {"message":"check back later",
+                              "status":"processing"}
+        
                 return
 
             # query.status == 'wait'
             
-            if os.name in ['nt', 'posix']:      # create elif block for 'posix'
+            if os.name in ['nt', 'posix']:
                 sock = socket.socket()
                 sock.bind(('', 0))  
                 host, port = sock.getsockname()
@@ -89,7 +89,8 @@ class Query:
                 resp.status = falcon.HTTP_201
             elif status == 202:
                 resp.status = falcon.HTTP_202
-                resp.media = {"message":"check back later", "status":"processing"}
+                resp.media = {"message":"check back later",
+                              "status":"processing"}
     
         except:
             logging.error("api.views.query.Query", exc_info=True)
