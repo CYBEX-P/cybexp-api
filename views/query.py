@@ -26,8 +26,8 @@ class Query:
     def on_post(self, req, resp):
         try:
             try:
-                query_type = req.media.pop('type')
-                query_data = req.media.pop('data')
+                qtype = req.media.pop('type')
+                qdata = req.media.pop('data')
             except (KeyError, falcon.errors.HTTPBadRequest) as err:
                 resp.media = {"message" : "Invalid query format! " + \
                               repr(err) + str(err)}
@@ -36,10 +36,10 @@ class Query:
       
             userid = "identity--2b419244-b973-4d6e-94c5-378db82d8efa" # placeholder, replace with PyJWT
       
-            canonical_data = canonical(query_data).encode()
+            canonical_data = canonical(qdata).encode()
             encrypted_data = str(encrypt_file(canonical_data))
             
-            query = TDQL(query_type, encrypted_data, userid, time.time())
+            query = TDQL(qtype, encrypted_data, userid, time.time())
           
             if query.status == 'ready':
                 report = self.report_backend.find_one(
@@ -52,10 +52,7 @@ class Query:
                 resp.status = falcon.HTTP_202
                 resp.media = {"message":"check back later",
                               "status":"processing"}
-        
                 return
-
-            # query.status == 'wait'
             
             if os.name in ['nt', 'posix']:
                 sock = socket.socket()
@@ -66,7 +63,7 @@ class Query:
                 sock.listen()
               
                 query.setsocket(host, port, nonce)
-                query.setstatus('wait')
+                query.status = 'wait'
                 
                 status = 202
                 while True:
@@ -84,8 +81,8 @@ class Query:
                 query = self.report_backend.find_one(
                     {'_hash': query._hash})
                 report = self.report_backend.find_one(
-                    {'_hash': query['report_id']}, {'_id': 0})
-                resp.media = report['data']
+                    {'_hash': query['data']['report_id'][0]}, {'_id': 0})
+                resp.media = report
                 resp.status = falcon.HTTP_201
             elif status == 202:
                 resp.status = falcon.HTTP_202
