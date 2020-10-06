@@ -6,4 +6,4 @@ import api
 # # uWSGI will look for this variable
 # application = myproject.create_api(config)
 
-appication = api.app
+application = api.app
