@@ -4,12 +4,13 @@ hupper -m api
 ```
 
 
-## deployment install 
+## deployment 
 
 ```bash
 source env/bin/activate
+#install dependency
 pip install uwsgi
 
 # run 
-uwsgi --init uwsgi.init
+/path/to/env/bin/uwsgi --init uwsgi.init
 ```
