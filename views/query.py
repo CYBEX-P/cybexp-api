@@ -22,6 +22,9 @@ Instance._backend = _BACKEND
 # === Query Class ===
 
 class Query:
+    """
+    This class handles query that are requested from indicated user end-points
+    """
     report_backend = _BACKEND
   
     def on_post(self, req, resp):

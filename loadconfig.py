@@ -56,7 +56,24 @@ def update(d, u):
     return d
 
 def get_config(filename='config.json', db='all'):
-    """Read config from file `config.json`."""
+    """
+    Read config from file `config.json`.
+    Any config values missing will be substituted with the corresponding default value.
+
+    Raises
+    ------
+    FileNotFoundError
+        configuration will eniterly be default config.
+    JSONDecodeError
+        Bad configuration file logging error, system exits.
+    
+    Return
+    ------
+    config: Dictionary
+        configuration values
+
+        
+    """
   
     try:
         this_dir = os.path.dirname(__file__)
@@ -103,15 +120,27 @@ def get_backend(filename='config.json', db='tahoe'):
     return backend
 
 def get_analytics_backend(filename='config.json'):
+    """
+    Retrieves the analytics backend identity for the API 
+    """
     return get_backend(filename, db='analytics')
 
 def get_archive_backend(filename='config.json'):
+    """
+    Retrieves the archive backend identity for the API 
+    """
     return get_backend(filename, db='archive')
 
 def get_report_backend(filename='config.json'):
+    """
+    Retrieves the report backend identity for the API 
+    """
     return get_backend(filename, db='report')
 
 def get_tahoe_backend(filename='config.json'):
+    """
+    Retrieves the tahoe backend identity for the API 
+    """
     return get_backend(filename, db='tahoe')
 
 

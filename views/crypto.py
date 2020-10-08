@@ -1,6 +1,10 @@
 # =========== Encryption ========================
 
 def encrypt_file(fbytes, fpub_name="pub.pem"):
+    """
+
+    Parameters
+    """
     
     from Crypto.PublicKey import RSA
     from Crypto.Random import get_random_bytes

@@ -40,7 +40,7 @@ class Raw(object):
 
         Parameters
         ----------
-        req: Input Cofig Object
+        req: Input Config Object
             The Input Configuration object. Mandatory values include:
             'typetag', 'name', 'orgid', 'timezone', 'fid' along with the unfiltered data.
         
