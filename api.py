@@ -4,7 +4,7 @@ import falcon
 import logging
 
 ### Logging
-logging.basicConfig(filename = 'api.log') 
+##logging.basicConfig(filename = 'api.log') 
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s %(levelname)s %(filename)s:%(lineno)s' \
