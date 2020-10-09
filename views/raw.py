@@ -45,7 +45,7 @@ class Raw(object):
             'typetag', 'name', 'orgid', 'timezone', 'fid' along with the unfiltered data.
         
         resp: Falcon Request Object
-            Handles the HTTP responses
+            Handles the HTTP API responses
 
 
         Raises

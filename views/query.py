@@ -23,11 +23,43 @@ Instance._backend = _BACKEND
 
 class Query:
     """
-    This class handles query that are requested from indicated user end-points
+    handles incoming querys that are requested from the user
+    
+    Attributes
+    ----------
+    report_backend:
+        The backend identity that the query will be sent towards. The identity it pulled from the API loadconfig file
+        Default: localhost backend identity
     """
     report_backend = _BACKEND
   
     def on_post(self, req, resp):
+        """
+        Attempts to extract the itype and data from the passed 'req'. If those two types are in the incorrect
+        formatting when passed, a bad request is raised along with an HTTP 400 response. Otherwise, A session
+        JSON web token is generated and the data gets canonically interpreted as it is currently untrusted data;
+        that canonical data then gets it's own hash generated in sha256. The untrusted data then gets encrypted
+        from an encyption function call from the crypto view.
+
+        Once the data has been encrypted, the web token, encoded data, data hash, and data itype get passed into
+        a new Tahoe data structure TDQL. The API will then prompt if the report is ready or to come back later on
+        the state of the query report.
+
+        Parameters
+        ----------
+        req: Dict of string values
+            Holds the 
+        resp: Falcon Object
+            Handles the HTTP API responses
+
+        Raises
+        ------
+        KeyError, falcon.errors.HTTPBadRequest:
+            Invalid query format of the values in the passed 'req' data
+        
+        Server Error:
+            Server response stemming from an unconditional error
+        """
         try:
             try:
                 qtype = req.media.pop('type')

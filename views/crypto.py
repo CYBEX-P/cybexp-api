@@ -2,8 +2,18 @@
 
 def encrypt_file(fbytes, fpub_name="pub.pem"):
     """
-
+    Data sets sent from querys get encrypted in here. A session key is generated and encrypted
+    with the public RSA key. The data is then ecrypted with the public RSA key via a
+    tag and cyphertext. the encrypted session and data are returned
+    
     Parameters
+    ----------
+    fybtes: String or list of Strings
+        the data that will be encrypted
+    fpub_name:String
+        the public key to be used
+        Default: pub.pem
+
     """
     
     from Crypto.PublicKey import RSA
