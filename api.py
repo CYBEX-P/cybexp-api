@@ -3,6 +3,14 @@
 import falcon
 import logging
 
+import sys
+sys.path.insert(1, '/home/nacho/Projects/tahoe0.7-dev/')
+import tahoe
+from tahoe.identity import IdentityBackend, Identity
+
+
+
+
 ### Logging
 #logging.basicConfig(filename = 'api.log') 
 logging.basicConfig(
@@ -20,13 +28,36 @@ app = falcon.App()
 import views
 import resource
 
+DEBUG =True
+
+
+if DEBUG:
+   ident_mongo_url="mongodb://localhost"
+   idnt_bnd = IdentityBackend(mongo_url=ident_mongo_url, create=False)
+   Identity._backend = idnt_bnd 
+else:
+   raise Exception("API: implement loadconfig here")
+
 ### Routes
 app.add_route('/query', views.Query())
 app.add_route('/raw', views.Raw())
 
-tk_name = "m"
-app.add_route('/{tk_name}/{var1}/{var2}',resource.TokenManager())
-app.add_route('/{tk_name}/{var1}',resource.TokenManager())
+# tk_name = "m"
+# app.add_route('/{tk_name}/add/config',resource.AddConfig())
+
+# app.add_route('/{tk_name}/{var1}/{var2}',resource.TokenManager())
+# app.add_route('/{tk_name}/{var1}',resource.TokenManager())
+
+
+app.add_route('/test/token', resource.TokenTest(ident_backend=idnt_bnd))
+app.add_route('/get/my/hash', resource.GetMyHash(ident_backend=idnt_bnd))
+app.add_route('/login', resource.Login(ident_backend=idnt_bnd))
+# app.add_route('/logout', resource.Logout(ident_backend=idnt_bnd))
+app.add_route('/add/user', resource.RegisterUser(ident_backend=idnt_bnd))
+app.add_route('/add/org', resource.RegisterOrg(ident_backend=idnt_bnd))
+app.add_route('/add/config', resource.AddConfig(ident_backend=idnt_bnd))
+
+app.add_route('/change/org/acl', resource.ChangeACL(ident_backend=idnt_bnd))
 
 ### Test Windows >> hupper -m api
 import os
