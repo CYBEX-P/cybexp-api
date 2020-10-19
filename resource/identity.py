@@ -35,17 +35,17 @@ class TokenTest(object):
     def on_post(self, req, resp):
         return self.token_test(req,resp)
 
-    @ident_common.extract_request_data() # for now validate token uses this
+    # @ident_common.extract_request_data() # for now validate token uses this
     @ident_common.validate_token
     @ident_common.exception_handler
-    def token_test(self, req, resp,request_data, user_object, **kwargs):
+    def token_test(self, req, resp,user_object, token, **kwargs):
         try:
-            # tok = user_object.token # this will generate new token, unwanted
-            tok = request_data["token"]
-            resp.media = {"message" : "Token valid", "token":tok}
+            resp.media = {"message" : "Token valid", "token":token}
             resp.status = falcon.HTTP_200
             return
         except:
+            traceback.print_exc()
+
             resp.media = {"message" : "401 Unauthorized"}
             resp.status = falcon.HTTP_401
             return

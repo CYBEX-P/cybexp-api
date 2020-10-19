@@ -128,9 +128,26 @@ def validate_token(func):
         try:
             if early_return(resp):
                 return
-            request_data = kwargs["request_data"]
+            try:
+                sp = req.auth.split(" ",1)
+                typ = sp[0]
+                token = sp[1].strip()
+                print("typ",typ)
+                print("tok", token)
+                if "Bearer" != typ:
+                    resp.media = {"message": "auth must be of type Bearer"}
+                    resp.status = falcon.HTTP_400
+                    return
+            except:
+                traceback.print_exc()
+                resp.media = {"message": "2: auth must be of type Bearer"}
+                resp.status = falcon.HTTP_400
+                return
+            # print("auth", req.auth)
+            # print(req)
+            # request_data = kwargs["request_data"]
             # print(request_data)
-            token = request_data["token"]
+            # token = request_data["token"]
             # token = req.media.get('token')
             # print(self)
             if is_token_revoked(self.ident_backend, token):
@@ -139,6 +156,7 @@ def validate_token(func):
                 return
 
             payload = get_payload(token) # if valid therefore there exists valid user
+            print("payload", payload)
             if payload:
                 user = hash_to_user(self.ident_backend, payload["_hash"])
 
@@ -148,6 +166,8 @@ def validate_token(func):
                     return
 
                 kwargs["user_object"] = user
+                kwargs["token"] = token
+
 
                 r = func(self, req, resp, *args,**kwargs)
                 return r
@@ -336,11 +356,11 @@ def required_groups_any(*args_main, **kwrgs_main):
                     if is_user_in_org(self.ident_backend, org_name, user_object._hash):
                         r = func(self, req, resp, *args,**kwargs)
                         return r
-                    else:
-                        resp.media = {"message": "Forbidden"}
-                        resp.status = falcon.HTTP_404
-                        # resp.status = falcon.HTTP_403
-                        return
+                    
+                resp.media = {"message": "Forbidden"}
+                resp.status = falcon.HTTP_404
+                # resp.status = falcon.HTTP_403
+                return
 
             except falcon.errors.HTTPBadRequest as err:
                   resp.media = {"message" : "Invalid input! " +
