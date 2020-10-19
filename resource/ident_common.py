@@ -375,7 +375,6 @@ def required_groups_any(*args_main, **kwrgs_main):
 
 # todo
 # redo documentation
-# add @require_group("admin")
 # docs; decorators must have self.ident_backend
 
 if __name__ == '__main__':
