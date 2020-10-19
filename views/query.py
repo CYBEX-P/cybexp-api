@@ -1,4 +1,5 @@
 import falcon
+import hashlib
 import logging
 import os
 import pdb
@@ -26,8 +27,8 @@ class Query:
     def on_post(self, req, resp):
         try:
             try:
-                query_type = req.media.pop('type')
-                query_data = req.media.pop('data')
+                qtype = req.media.pop('type')
+                qdata = req.media.pop('data')
             except (KeyError, falcon.errors.HTTPBadRequest) as err:
                 resp.media = {"message" : "Invalid query format! " + \
                               repr(err) + str(err)}
@@ -36,37 +37,36 @@ class Query:
       
             userid = "identity--2b419244-b973-4d6e-94c5-378db82d8efa" # placeholder, replace with PyJWT
       
-            canonical_data = canonical(query_data).encode()
-            encrypted_data = str(encrypt_file(canonical_data))
-      
-            query = TDQL(query_type, query_data, userid, time.time())
-            query._update({'data' : {'encrypted_data': encrypted_data}})
+            canon_qdata = canonical(qdata).encode()
+            qhash = hashlib.sha256(canon_qdata).hexdigest()
+        
+            enc_qdata = str(encrypt_file(canon_qdata))
+            
+            query = TDQL(qtype, enc_qdata, qhash, userid, time.time())
           
             if query.status == 'ready':
                 report = self.report_backend.find_one(
                     {'_hash': query.report_id}, {'_id': 0})
-                resp.media = report['data']
+                resp.media = report
                 resp.status = falcon.HTTP_201
                 return
               
             elif query.status == 'processing':
                 resp.status = falcon.HTTP_202
-                resp.media = {"message":"check back later", "status":"processing"}
-                #{"message" : "Please check back later on report_url", "report_url" : "/query/" + query.uuid}
+                resp.media = {"message":"check back later",
+                              "status":"processing"}
                 return
-
-            # query.status == 'wait'
             
-            if os.name in ['nt', 'posix']:      # create elif block for 'posix'
+            if os.name in ['nt', 'posix']:
                 sock = socket.socket()
                 sock.bind(('', 0))  
                 host, port = sock.getsockname()
-                nonce = secrets.token_hex(16)     # password # encrypt nonce
-                sock.settimeout(5)                # 5 seconds
+                nonce = secrets.token_hex(16)      # password # encrypt nonce
+                sock.settimeout(15)                # 5 seconds
                 sock.listen()
               
                 query.setsocket(host, port, nonce)
-                query.setstatus('wait')
+                query.status = 'wait'
                 
                 status = 202
                 while True:
@@ -84,15 +84,16 @@ class Query:
                 query = self.report_backend.find_one(
                     {'_hash': query._hash})
                 report = self.report_backend.find_one(
-                    {'_hash': query['report_id']}, {'_id': 0})
-                resp.media = report['data']
+                    {'_hash': query['data']['report_id'][0]}, {'_id': 0})
+                resp.media = report
                 resp.status = falcon.HTTP_201
             elif status == 202:
                 resp.status = falcon.HTTP_202
-                resp.media = {"message":"check back later", "status":"processing"}
+                resp.media = {"message":"check back later",
+                              "status":"processing"}
     
         except:
-            logging.exception("api.views.query.Query")
+            logging.error("api.views.query.Query", exc_info=True)
             resp.media = {"message":"Server Error!"}
             resp.status = falcon.HTTP_500
     

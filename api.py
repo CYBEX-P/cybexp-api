@@ -12,7 +12,7 @@ from tahoe.identity import IdentityBackend, Identity
 
 
 ### Logging
-#logging.basicConfig(filename = 'api.log') 
+##logging.basicConfig(filename = 'api.log') 
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s %(levelname)s %(filename)s:%(lineno)s' \
@@ -41,6 +41,7 @@ else:
 ### Routes
 app.add_route('/query', views.Query())
 app.add_route('/raw', views.Raw())
+#app.add_route('/hello', views.HelloWorld())
 
 # tk_name = "m"
 # app.add_route('/{tk_name}/add/config',resource.AddConfig())
@@ -60,8 +61,8 @@ app.add_route('/add/config', resource.AddConfig(ident_backend=idnt_bnd))
 app.add_route('/change/org/acl', resource.ChangeACL(ident_backend=idnt_bnd))
 
 ### Test Windows >> hupper -m api
-import os
-if __name__ == '__main__' :
+### Run the API
+if __name__ == '__main__':
     from wsgiref import simple_server
-    httpd = simple_server.make_server('127.0.0.1', 5000, app)
+    httpd = simple_server.make_server('0.0.0.0', 5000, app)
     httpd.serve_forever()
