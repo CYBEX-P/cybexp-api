@@ -34,6 +34,9 @@ Identity._backend = idnt_bnd
     
 
 ### Routes
+
+app.add_route('/ping', views.PingPong()) # for testing
+
 app.add_route('/query', views.Query())
 app.add_route('/raw', views.Raw())
 #app.add_route('/hello', views.HelloWorld())
