@@ -132,14 +132,14 @@ def validate_token(func):
                 sp = req.auth.split(" ",1)
                 typ = sp[0]
                 token = sp[1].strip()
-                print("typ",typ)
-                print("tok", token)
+                #print("typ",typ)
+                #print("tok", token)
                 if "Bearer" != typ:
                     resp.media = {"message": "auth must be of type Bearer"}
                     resp.status = falcon.HTTP_400
                     return
             except:
-                traceback.print_exc()
+                #traceback.print_exc()
                 resp.media = {"message": "2: auth must be of type Bearer"}
                 resp.status = falcon.HTTP_400
                 return
