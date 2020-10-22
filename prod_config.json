@@ -1,8 +1,8 @@
 {
     "api" : {
-        "url" : "http://cici-api:5001/",
+        "url" : "http://cici-api:5000/",
         "host" : "cici-api",
-        "port" : 5001,
+        "port" : 5000,
         "protocol" : "http"
     },   
     "cache" : {
