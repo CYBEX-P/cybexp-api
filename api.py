@@ -36,7 +36,10 @@ if DEBUG:
    idnt_bnd = IdentityBackend(mongo_url=ident_mongo_url, create=False)
    Identity._backend = idnt_bnd 
 else:
-   raise Exception("API: implement loadconfig here")
+    import loadconfig
+    idnt_bnd = loadconfig.get_identity_backend()
+    Instance._backend = idnt_bnd
+    
 
 ### Routes
 app.add_route('/query', views.Query())
