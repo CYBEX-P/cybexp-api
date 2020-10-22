@@ -128,7 +128,7 @@ def get_tahoe_backend(filename='config.json'):
     return get_backend(filename, db='tahoe')
 
 
-def get_identity_backend(filename='config.json', db='tahoe'):
+def get_identity_backend(filename='config.json', db='identity'):
     identityconfig = get_config(filename, db)
     mongo_url = identityconfig['mongo_url']
     dbname = identityconfig['db']
