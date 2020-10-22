@@ -156,7 +156,7 @@ def validate_token(func):
                 return
 
             payload = get_payload(token) # if valid therefore there exists valid user
-            print("payload", payload)
+            #print("payload", payload)
             if payload:
                 user = hash_to_user(self.ident_backend, payload["_hash"])
 
