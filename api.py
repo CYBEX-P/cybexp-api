@@ -30,7 +30,7 @@ import resource
 
 import loadconfig
 idnt_bnd = loadconfig.get_identity_backend()
-Instance._backend = idnt_bnd
+Identity._backend = idnt_bnd
     
 
 ### Routes
