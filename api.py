@@ -28,17 +28,9 @@ app = falcon.App()
 import views
 import resource
 
-DEBUG =True
-
-
-if DEBUG:
-   ident_mongo_url="mongodb://localhost"
-   idnt_bnd = IdentityBackend(mongo_url=ident_mongo_url, create=False)
-   Identity._backend = idnt_bnd 
-else:
-    import loadconfig
-    idnt_bnd = loadconfig.get_identity_backend()
-    Instance._backend = idnt_bnd
+import loadconfig
+idnt_bnd = loadconfig.get_identity_backend()
+Instance._backend = idnt_bnd
     
 
 ### Routes
