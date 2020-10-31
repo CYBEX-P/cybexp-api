@@ -35,10 +35,13 @@ Identity._backend = idnt_bnd
 
 ### Routes
 
-app.add_route('/ping', views.PingPong()) # for testing
-
+app.add_route('/ping', views.PingPong())
 app.add_route('/query', views.Query())
 app.add_route('/raw', views.Raw())
+
+
+
+
 #app.add_route('/hello', views.HelloWorld())
 
 # tk_name = "m"
@@ -58,9 +61,13 @@ app.add_route('/add/config', resource.AddConfig(ident_backend=idnt_bnd))
 
 app.add_route('/change/org/acl', resource.ChangeACL(ident_backend=idnt_bnd))
 
-### Test Windows >> hupper -m api
-### Run the API
+
+# Test Windows >> hupper -m api
+# Run the API
 if __name__ == '__main__':
     from wsgiref import simple_server
     httpd = simple_server.make_server('0.0.0.0', 5000, app)
     httpd.serve_forever()
+
+
+    

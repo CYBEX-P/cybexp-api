@@ -29,6 +29,7 @@ class Query:
             try:
                 qtype = req.media.pop('type')
                 qdata = req.media.pop('data')
+                qredo = req.media.pop('redo', None)
             except (KeyError, falcon.errors.HTTPBadRequest) as err:
                 resp.media = {"message" : "Invalid query format! " + \
                               repr(err) + str(err)}
@@ -44,14 +45,14 @@ class Query:
             
             query = TDQL(qtype, enc_qdata, qhash, userid, time.time())
           
-            if query.status == 'ready':
+            if not qredo and query.status == 'ready':
                 report = self.report_backend.find_one(
                     {'_hash': query.report_id}, {'_id': 0})
                 resp.media = report
                 resp.status = falcon.HTTP_201
                 return
               
-            elif query.status == 'processing':
+            elif not qredo and query.status == 'processing':
                 resp.status = falcon.HTTP_202
                 resp.media = {"message":"check back later",
                               "status":"processing"}
@@ -62,7 +63,7 @@ class Query:
                 sock.bind(('', 0))  
                 host, port = sock.getsockname()
                 nonce = secrets.token_hex(16)      # password # encrypt nonce
-                sock.settimeout(15)                # 5 seconds
+                sock.settimeout(5)                # 5 seconds
                 sock.listen()
               
                 query.setsocket(host, port, nonce)

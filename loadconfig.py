@@ -1,9 +1,5 @@
 """Read config.json file and initialize database or Tahoe Backend."""
 
-
-# import sys
-# sys.path.insert(1, '/home/nacho/Projects/tahoe0.7-dev/')
-
 import collections.abc
 import gridfs
 import json
@@ -70,7 +66,7 @@ def get_config(filename='config.json', db='all'):
             config = json.load(f)
     except FileNotFoundError:
         config = default
-#        logging.warning("No config file found, using default config")
+        logging.warning("No config file found, using default config")
     except json.decoder.JSONDecodeError:
         logging.error("Bad configuration file!", exc_info=True)
         sys.exit(1)  # 1 = error in linux
