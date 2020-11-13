@@ -39,7 +39,7 @@ else:
    raise Exception("API: implement loadconfig here")
 
 ### Routes
-app.add_route('/query', views.Query())
+app.add_route('/query', views.Query(ident_backend=idnt_bnd))
 app.add_route('/raw', views.Raw())
 #app.add_route('/hello', views.HelloWorld())
 

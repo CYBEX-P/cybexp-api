@@ -12,6 +12,11 @@ from tahoe import Instance, TDQL
 from tahoe.misc import canonical
 
 import loadconfig
+
+import sys
+sys.path.insert(1, '/opt/cybexp/api/resource')
+import ident_common
+
 from .crypto import encrypt_file
 
 
@@ -23,8 +28,12 @@ Instance._backend = _BACKEND
 
 class Query:
     report_backend = _BACKEND
-  
-    def on_post(self, req, resp):
+    def __init__(self, ident_backend):
+        self.ident_backend = ident_backend #required by decorator
+    
+    @ident_common.validate_token
+    @ident_common.exception_handler
+    def on_post(self, req, resp, **kwargs):
         try:
             try:
                 qtype = req.media.pop('type')
