@@ -32,7 +32,7 @@ class TokenTest(object):
     def __init__(self, ident_backend):
         self.ident_backend = ident_backend #required by decorator
 
-    def on_post(self, req, resp):
+    def on_get(self, req, resp):
         return self.token_test(req,resp)
 
     # @ident_common.extract_request_data() # for now validate token uses this
@@ -220,10 +220,10 @@ class ChangeACL(object):
 class GetMyHash(object):
     def __init__(self, ident_backend):
         self.ident_backend = ident_backend #required by decorator
-    def on_post(self, req, resp):
+    def on_get(self, req, resp):
         return self.get_my_hash(req,resp)
 
-    @ident_common.extract_request_data()
+    #@ident_common.extract_request_data()
     @ident_common.validate_token
     @ident_common.exception_handler
     def get_my_hash(self, req, resp, user_object, **kwargs):
