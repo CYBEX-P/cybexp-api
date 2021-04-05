@@ -9,9 +9,88 @@ import loadconfig
 
 from .common import ResourceBase, exception_handler, validate_token, \
     tahoe, Identity
-from tahoe.identity.error import UserIsAdminError, UserIsInAclError, \
+from tahoe.identity.error import OrgExistsError, UserExistsError, \
+     UserIsAdminError, UserIsInAclError, \
      UserIsNotInAclError, UserIsInOrgError, UserIsNotAdminError, \
      UserIsNotInOrgError, UserIsOnlyAdminError
+
+
+class CreateOrg(ResourceBase):
+    """Register/create Org."""
+
+    @validate_token
+    @exception_handler
+    def on_post(self, req, resp):
+
+        superuser = req.context['user']
+
+        try:
+            orgname = req.media['orgname']
+            user = req.media['user']
+            admin = req.media['admin']
+            name = req.media['name']
+        except KeyError as e:
+            resp.media = {"message": repr(e)}
+            resp.status = falcon.HTTP_400
+            return      
+
+        try:
+            org = superuser.create_org(orgname, user, admin, name)
+        except AttributeError:
+            resp.media = {"message" : "Only CYBEX-P admin can create org!"}
+            resp.status = falcon.HTTP_401
+            return
+        except OrgExistsError as e:
+            resp.media = {"message" : str(e)}
+            resp.status = falcon.HTTP_400
+            return
+        else:
+            resp.media = {"message" : "Org created!",
+                         "result": org.doc}
+            resp.status = falcon.HTTP_201
+            return
+
+
+class CreateUser(ResourceBase):
+    """Register/create user."""
+
+    @validate_token
+    @exception_handler
+    def on_post(self, req, resp):
+
+        superuser = req.context['user']
+
+        try:
+            email = req.media['email']
+            password = req.media['password']
+            password2 = req.media['password2']
+            name = req.media['name']
+        except KeyError as e:
+            resp.media = {"message": repr(e)}
+            resp.status = falcon.HTTP_400
+            return      
+        
+        if password != password2:
+            resp.media = {"message" : "Passwords do not match!"}
+            resp.status = falcon.HTTP_400
+            return
+
+        try:
+            user = superuser.create_user(email, password, name)
+        except AttributeError:
+            resp.media = {"message" : "Only CYBEX-P admin can create user!"}
+            resp.status = falcon.HTTP_401
+            return
+        except UserExistsError as e:
+            resp.media = {"message" : str(e)}
+            resp.status = falcon.HTTP_400
+            return
+        else:
+            resp.media = {"message" : "User created!",
+                         "result": user.doc_no_pass,
+                         "token": user.token}
+            resp.status = falcon.HTTP_201
+            return
 
 
 class OrgAddUser(ResourceBase):
@@ -226,80 +305,6 @@ class UserInfoSelf(ResourceBase):
     
 
 ##class RegisterUser(ResourceBase):
-##    """Register/create user."""
-##
-##    @validate_token
-##    @exception_handler
-##    def on_post(self, req, resp):
-##        """
-##        Handles post requests.
-##
-##        Parameters
-##        ----------
-##        
-##        """
-##        
-##        email = req.media.pop('email')
-##        password = req.media.pop('password')
-##        password2 = req.media.pop('password2')
-##        name = req.media.pop('name')
-##        
-##        if password != password2:
-##            resp.media = {"message" : "Passwords do not match!"}
-##            resp.status = falcon.HTTP_400
-##            return
-##
-##        try:
-##            user = self._backend.create_user(email, password, name)
-##
-##            resp.media = {"message" : "User created",
-##                         "email": user.email,
-##                         "token": user.token}
-##            resp.status = falcon.HTTP_201
-##            return
-##
-##        except tahoe.identity.backend.DuplicateUserError:
-##            resp.media = {"message" : "Username (email) already exists!"}
-##            resp.status = falcon.HTTP_400
-##            return
-
-
-##    @ident_common.extract_request_data(required_fields=["email", "password","password2","name"])
-##    @ident_common.validate_token
-##    @ident_common.required_groups_any(required_groups_any=["system_register"])
-##    @exception_handler
-##    def registerUser(self, req, resp, request_data, **kwargs):
-##        # print(request_data)
-##        try:
-##            # print("ident_backend:", self.ident_backend)
-##            if not self.ident_backend.user_exists(request_data["email"]):
-##                if request_data["password"] != request_data["password2"]:
-##                    resp.media = {"message" : "Passwords must match"}
-##                    resp.status = falcon.HTTP_400
-##                    return
-##                user = User(
-##                                email=request_data["email"],
-##                                password=request_data["password"],
-##                                name=request_data["name"],
-##                                # _backend=self.ident_backend
-##                           )
-##
-##                resp.media = {"message" : "Created",
-##                             "email": request_data["email"],
-##                             "token":user.token}
-##                resp.status = falcon.HTTP_201
-##                return
-##
-##            else: # user exists
-##                resp.media = {"message" : "User already exists"}
-##                resp.status = falcon.HTTP_409
-##                return
-##        except:
-##            # traceback.print_exc()
-##            resp.media = {"message" : "Server Error"}
-##            resp.status = falcon.HTTP_500
-##            return
-
 
 
 

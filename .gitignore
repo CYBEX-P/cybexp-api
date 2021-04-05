@@ -3,6 +3,7 @@
 *playpen.py
 *.ini
 Rubbish/
+_backup/
 
 # ================ Data/Log Files ================
 *.csv
