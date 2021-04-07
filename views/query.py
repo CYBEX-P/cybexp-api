@@ -15,6 +15,11 @@ if __name__ != 'api.views.query':
     del sys
 
 import loadconfig
+
+import sys
+sys.path.insert(1, '/opt/cybexp/api/resource')
+import ident_common
+
 from .crypto import encrypt_file
 from resource.common import validate_token, tahoe
 
