@@ -26,7 +26,8 @@ default = {
     },
     "api": {
         "url": "http://localhost:5000/",
-        "token": ""
+        "token": "",
+        "host" : "localhost",
     },
     "archive": { 
         "mongo_url": "mongodb://localhost:27017/",
@@ -128,7 +129,7 @@ def get_api(filename='config.json'):
     """
         
     apiconfig = get_config(filename, 'api')
-    return apiconfig['url'], apiconfig['token']
+    return apiconfig['url'], apiconfig['token'], apiconfig['host']
 
 
 def get_cache_db(filename='config.json'):

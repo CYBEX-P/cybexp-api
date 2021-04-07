@@ -8,22 +8,29 @@ import socket
 import time
 import uuid
 
-from tahoe import Instance, TDQL
-from tahoe.misc import canonical
+if __name__ != 'api.views.query':
+    import sys
+    J = os.path.join
+    sys.path = ['..', J('..', '..')] + sys.path
+    del sys
 
 import loadconfig
 from .crypto import encrypt_file
+from resource.common import validate_token, tahoe
 
+from tahoe import TDQL
+from tahoe.misc import canonical
 
 _BACKEND = loadconfig.get_report_backend()
-Instance._backend = _BACKEND
+TDQL._backend = _BACKEND
 
 
 # === Query Class ===
 
-class Query:
+class Query(object):
     report_backend = _BACKEND
-  
+
+    @validate_token
     def on_post(self, req, resp):
         try:
             try:
@@ -35,8 +42,9 @@ class Query:
                               repr(err) + str(err)}
                 resp.status = falcon.HTTP_400
                 return     
-      
-            userid = "identity--2b419244-b973-4d6e-94c5-378db82d8efa" # placeholder, replace with PyJWT
+
+            user = req.context['user']
+            userid = user._hash
       
             canon_qdata = canonical(qdata).encode()
             qhash = hashlib.sha256(canon_qdata).hexdigest()
@@ -45,7 +53,7 @@ class Query:
             
             query = TDQL(qtype, enc_qdata, qhash, userid, time.time())
           
-            if not qredo and query.status == 'ready':
+            if not qredo and query.status in ['ready', 'failed']:
                 report = self.report_backend.find_one(
                     {'_hash': query.report_id}, {'_id': 0})
                 resp.media = report
@@ -62,8 +70,8 @@ class Query:
                 sock = socket.socket()
                 sock.bind(('', 0))  
                 host, port = sock.getsockname()
-                nonce = secrets.token_hex(16)      # password # encrypt nonce
-                sock.settimeout(5)                # 5 seconds
+                nonce = secrets.token_hex(16)   # password # encrypt nonce
+                sock.settimeout(5)              # 5 seconds
                 sock.listen()
               
                 query.setsocket(host, port, nonce)
@@ -95,7 +103,7 @@ class Query:
     
         except:
             logging.error("api.views.query.Query", exc_info=True)
-            resp.media = {"message":"Server Error!"}
+            resp.media = {"message": "Server Error!"}
             resp.status = falcon.HTTP_500
     
 

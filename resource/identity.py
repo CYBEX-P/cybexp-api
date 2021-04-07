@@ -9,8 +9,9 @@ import loadconfig
 
 from .common import ResourceBase, exception_handler, validate_token, \
     tahoe, Identity
-from tahoe.identity.error import OrgExistsError, UserExistsError, \
-     UserIsAdminError, UserIsInAclError, \
+from tahoe.identity.error import AdminIsNotUserError, InvalidUserHashError, \
+     OrgExistsError, \
+     UserExistsError, UserIsAdminError, UserIsInAclError, \
      UserIsNotInAclError, UserIsInOrgError, UserIsNotAdminError, \
      UserIsNotInOrgError, UserIsOnlyAdminError
 
@@ -40,7 +41,7 @@ class CreateOrg(ResourceBase):
             resp.media = {"message" : "Only CYBEX-P admin can create org!"}
             resp.status = falcon.HTTP_401
             return
-        except OrgExistsError as e:
+        except (OrgExistsError, AdminIsNotUserError) as e:
             resp.media = {"message" : str(e)}
             resp.status = falcon.HTTP_400
             return
@@ -146,7 +147,8 @@ class OrgAddUser(ResourceBase):
                 org.add_user(user_hash_list)
             elif add_to == 'acl':
                 org.add_user_to_acl(user_hash_list)
-        except (UserIsAdminError, UserIsInAclError, UserIsInOrgError) as e:
+        except (UserIsAdminError, UserIsInAclError,
+                UserIsInOrgError, InvalidUserHashError) as e:
             resp.media = {"message": f"{e}"}
             resp.status = falcon.HTTP_400
             return

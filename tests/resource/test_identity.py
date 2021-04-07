@@ -11,8 +11,8 @@ from tahoe.identity import SuperUser, User, Org
 
 if __name__ != 'api.tests.identity.test_identity':
     import sys, os
-    sys.path = ['..', os.path.join('..', '..'),
-                os.path.join('..', '..', '..')] + sys.path
+    J = os.path.join
+    sys.path = ['..', J('..', '..'), J('..', '..', '..')] + sys.path
     del sys, os
 
 

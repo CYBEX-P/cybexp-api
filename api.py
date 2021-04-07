@@ -35,12 +35,8 @@ app = falcon.App()
 # -----
 import views
 
-
-
-### Routes
-
 app.add_route('/ping', views.PingPong())
-##app.add_route('/query', views.Query())
+app.add_route('/query', views.Query())
 ##app.add_route('/raw', views.Raw())
 
 
