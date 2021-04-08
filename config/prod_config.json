@@ -24,5 +24,15 @@
         "mongo_url": "mongodb://mongo1,mongo2,mongo2:27020/?replicaSet=rs0",
         "db": "tahoe_db",
         "coll": "instance"
+    },
+    "archive": {
+        "mongo_url": "mongodb://mongo1,mongo2,mongo2:27020/?replicaSet=rs0",
+        "db": "tahoe_db",
+        "coll": "instance"
+    },
+    "analytics": {
+        "mongo_url": "mongodb://mongo1,mongo2,mongo2:27020/?replicaSet=rs0",
+        "db": "tahoe_db",
+        "coll": "instance"
     }
 }
