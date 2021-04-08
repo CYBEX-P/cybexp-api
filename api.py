@@ -94,10 +94,6 @@ def tearDownTestBackend(_id_backend):
 
 
 
-
-
-
-
 #app.add_route('/hello', views.HelloWorld())
 
 # tk_name = "m"
