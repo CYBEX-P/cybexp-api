@@ -1,9 +1,8 @@
 """
-Functions in this module are used to read and parse CYBEX-P config file.
+Functions to initilize tahoe backends, initilize cache DB
+and parse api config.
 
-There are functions to initilize tahoe backends and parse api config.
-
-Updated: 3/8/2021 15:08
+Updated: 4/13/2021 05:39
 """
 
 import collections.abc
@@ -21,7 +20,7 @@ import tahoe
 default = {
     "analytics": { 
         "mongo_url": "mongodb://localhost:27017/",
-        "db": "analytics_db",
+        "db": "tahoe_db",
         "coll": "instance",
     },
     "api": {
@@ -68,7 +67,7 @@ def update(d, u):
 
 
 def get_config(filename='config.json', db='all'):
-    """Read and config config from config file."""
+    """Read and parse config from config file."""
   
     try:
         """This block succeeds if `filename` is valid absolute path"""
@@ -84,7 +83,7 @@ def get_config(filename='config.json', db='all'):
         except FileNotFoundError:
             """`filename` is not valid"""
             config = default
-            logging.warning("No config file found, using default config")
+            logging.warning("No config file found, using default config!")
         except json.decoder.JSONDecodeError:
             logging.error(f"Bad config file: {filename}", exc_info=True)
             sys.exit(1)  # 1 = error in linux
@@ -126,6 +125,8 @@ def get_api(filename='config.json'):
         Complete URL of the API like `protocol://host:port`.
     token : str
         JWT token to authenticate with the API.
+    host : str
+        Hostname of the api (e.g. `localhost`).
     """
         
     apiconfig = get_config(filename, 'api')

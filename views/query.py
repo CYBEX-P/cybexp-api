@@ -16,12 +16,8 @@ if __name__ != 'api.views.query':
 
 import loadconfig
 
-import sys
-sys.path.insert(1, '/opt/cybexp/api/resource')
-import ident_common
-
 from .crypto import encrypt_file
-from resource.common import validate_token, tahoe
+from resource.common import validate_user, tahoe
 
 from tahoe import TDQL
 from tahoe.misc import canonical
@@ -35,7 +31,7 @@ TDQL._backend = _BACKEND
 class Query(object):
     report_backend = _BACKEND
 
-    @validate_token
+    @validate_user
     def on_post(self, req, resp):
         try:
             try:
