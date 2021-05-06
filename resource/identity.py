@@ -1,4 +1,4 @@
-"""api.resource.identity contains views for User and Org management."""
+"""Views for User and Org management."""
 
 import falcon
 import pdb
@@ -10,8 +10,7 @@ import loadconfig
 from .common import ResourceBase, exception_handler, validate_user, \
     tahoe, Identity
 from tahoe.identity.error import AdminIsNotUserError, InvalidUserHashError, \
-     OrgExistsError, \
-     UserExistsError, UserIsAdminError, UserIsInAclError, \
+     OrgExistsError, UserExistsError, UserIsAdminError, UserIsInAclError, \
      UserIsNotInAclError, UserIsInOrgError, UserIsNotAdminError, \
      UserIsNotInOrgError, UserIsOnlyAdminError
 

@@ -9,6 +9,7 @@ import unittest
 
 import tahoe
 
+from tahoe.tests.identity.test_backend import setUpBackend, tearDownBackend
 
 _LOGGER = logging.getLogger()
 
@@ -47,11 +48,15 @@ def delete_test_data():
 
 def setUpModule():
     global _ID_B
-    _ID_B = api.setupTestBackend()
+    
+    _backend = setUpBackend()
+    _ID_B = _backend
+    print(api)
+    api.configureIDBackend(_backend)
     
 
 def tearDownModule():
-    api.tearDownTestBackend(_ID_B)
+    tearDownBackend(_ID_B)
 
 
 class BaseTestCase(testing.TestCase):
@@ -137,13 +142,13 @@ class TestRequireFields(BaseTestCase):
 class ResourceToTestValidateToken(resource.common.ResourceBase):
     """This is not a test case by itself."""
     
-    @resource.common.validate_token
+    @resource.common.validate_user
     def on_get(self, req, resp):
         resp.media = req.context['user'].doc
         resp.status = falcon.HTTP_200
         return
 
-    @resource.common.validate_token
+    @resource.common.validate_user
     def on_post(self, req, resp):
         resp.media = req.context['user'].doc
         resp.status = falcon.HTTP_200

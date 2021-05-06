@@ -18,7 +18,7 @@ class ResourceBase(object):
     """
 
 
-def setupIDBackend(_backend):
+def configureIDBackend(_backend):
     """
     `api.py` will call this function to setup identity backend.
 
@@ -82,9 +82,10 @@ def exception_handler(func):
         
         try:
             return func(self, req, resp, *args, **kwargs)
-        except falcon.errors.HTTPBadRequest as err:
-              resp.media = {"message" : "Invalid input" +
-                            repr(err) + str(err)}
+            
+        except (KeyError, falcon.errors.HTTPBadRequest) as err:
+              resp.media = {"message" : "Invalid input: " +
+                            repr(err) + ' ' + str(err) + '!'}
               resp.status = falcon.HTTP_400
               return
           
@@ -98,7 +99,7 @@ def exception_handler(func):
             raise
           
         except:
-            logging.exception("Error in api.identity", exc_info=True)
+            logging.exception("Exception", exc_info=True)
             resp.media = {"message" : "500 Server Error"}
             resp.status = falcon.HTTP_500
             return

@@ -7,9 +7,12 @@ from pprint import pprint
 import unittest
 
 import tahoe
+from tahoe import Instance
 from tahoe.identity import SuperUser, User, Org
+from tahoe.identity.backend import IdentityBackend, MockIdentityBackend
+from tahoe.tests.identity.test_backend import setUpBackend, tearDownBackend
 
-if __name__ != 'api.tests.identity.test_identity':
+if __name__ != 'api.tests.ttest_resource.test_identity':
     import sys, os
     J = os.path.join
     sys.path = ['..', J('..', '..'), J('..', '..', '..')] + sys.path
@@ -56,12 +59,20 @@ def delete_test_data():
 
 def setUpModule():
     global _ID_B
-    _ID_B = api.setupTestBackend()
+    
+    _backend = setUpBackend()
+    _ID_B = _backend
+    Instance.set_backend(_backend)
+    api.configureIDBackend(_backend)
+
+    assert User._backend is Instance._backend
+    assert SuperUser._backend is Instance._backend
+    assert Org._backend is Instance._backend
+    assert isinstance(Org._backend, (IdentityBackend, MockIdentityBackend))
     
 
 def tearDownModule():
-    api.tearDownTestBackend(_ID_B)
-
+    tearDownBackend(_ID_B)
 
 
 class BaseTestCase(testing.TestCase):

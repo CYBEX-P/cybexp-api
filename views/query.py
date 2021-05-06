@@ -52,7 +52,7 @@ class Query(object):
         
             enc_qdata = str(encrypt_file(canon_qdata))
             
-            query = TDQL(qtype, enc_qdata, qhash, userid, time.time())
+            query = TDQL(qtype, enc_qdata, qhash, userid)
           
             if not qredo and query.status in ['ready', 'failed']:
                 report = self.report_backend.find_one(
