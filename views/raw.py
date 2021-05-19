@@ -25,28 +25,33 @@ class Raw(object):
     @exception_handler
     @validate_org
     def on_post(self, req, resp):
+        org = req.context['org']
+        
         info = {}
         info['timestamp'] = time.time()
         info['processed'] = False
 
-        info['typetag'] = req.media.pop('typetag')
-        info['name'] = req.media.pop('name')
+        for part in req.media:
+            if part.name == 'file':
+                fdata = part.stream.read()
+                fenc = encrypt_file(fdata)
+                info['fid'] = self.fs.put(fenc, filename=part.filename)
 
-        org = req.context['org']
-        info['orgid'] = req.media.pop('orgid')
+            elif part.name in ['name', 'orgid', 'timezone', 'typetag']:
+                info[part.name] = part.text
+
+            else:
+                resp.media = {"message": "Invalid input: " + part.name}
+                resp.status = falcon.HTTP_400
+                return
+
         if info['orgid'] != org._hash:
             resp.media = {"message": "Token does not belong to orgid!"}
             resp.status = falcon.HTTP_400
             return
 
-        timezone = req.media.pop('timezone', None)
-        if timezone is None:
-            timezone = "UTC"
-        info['timezone'] = timezone
-
-        file = req.media.pop('file')
-        fenc = encrypt_file(file.stream.read())
-        info['fid'] = self.fs.put(fenc, filename=part.filename)
+        if 'timezone' not in info:
+            info['timezone'] = "UTC"
 
         _ = self.file_entries.insert_one(info)
         resp.media = {"message" : "File uploaded successfully!"}
