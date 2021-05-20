@@ -12,12 +12,10 @@ import loadconfig, resource, views
 # Logging
 # -------
 
-##logging.basicConfig(filename = 'api.log') 
-logging.basicConfig(
-    level=logging.ERROR,
-    format='\n\n%(asctime)s %(levelname)s %(filename)s:%(lineno)s' \
-    ' - %(funcName)() --  %(message)s'
-    )
+logging.basicConfig(fliename = 'api.log') 
+logging.basicConfig(level=logging.DEBUG,
+    format='\n\n%(asctime)s %(levelname)s: File %(filename)s,' \
+        ' line %(lineno)s in %(funcName)s \n%(message)s')
 
 
 def configureIDBackend(_id_backend):

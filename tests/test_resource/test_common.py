@@ -51,7 +51,6 @@ def setUpModule():
     
     _backend = setUpBackend()
     _ID_B = _backend
-    print(api)
     api.configureIDBackend(_backend)
     
 

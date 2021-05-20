@@ -45,6 +45,9 @@ class Raw(object):
                 resp.status = falcon.HTTP_400
                 return
 
+        for key in ['fid', 'name', 'orgid', 'typetag']:
+            _ = info[key] # Validate keys are present                
+
         if info['orgid'] != org._hash:
             resp.media = {"message": "Token does not belong to orgid!"}
             resp.status = falcon.HTTP_400
