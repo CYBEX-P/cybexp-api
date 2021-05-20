@@ -13,18 +13,26 @@ import loadconfig, resource, views
 # -------
 
 logging.basicConfig(fliename = 'api.log') 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.ERROR,
     format='\n\n%(asctime)s %(levelname)s: File %(filename)s,' \
         ' line %(lineno)s in %(funcName)s \n%(message)s')
 
 
 def configureIDBackend(_id_backend):
     """Call this function to setup identity backend."""
-    
     resource.common.configureIDBackend(_id_backend)
 
 def configureCacheDB(file_entries, fs):
     views.raw.configureCacheDB(file_entries, fs)
+
+
+# Temporary Fix
+
+_id_backend = loadconfig.get_identity_backend()
+configureIDBackend(_id_backend)
+
+file_entries, fs = loadconfig.get_cache_db()
+configureCacheDB(file_entries, fs)
 
 
 
