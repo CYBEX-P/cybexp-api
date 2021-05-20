@@ -12,7 +12,7 @@ import loadconfig, resource, views
 # Logging
 # -------
 
-logging.basicConfig(fliename = 'api.log') 
+logging.basicConfig(filename = 'api.log') 
 logging.basicConfig(level=logging.ERROR,
     format='\n\n%(asctime)s %(levelname)s: File %(filename)s,' \
         ' line %(lineno)s in %(funcName)s \n%(message)s')
