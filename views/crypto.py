@@ -1,6 +1,12 @@
-# =========== Encryption ========================
+"""Encrypt file with public key of processing server."""
 
-def encrypt_file(fbytes, fpub_name="pub.pem"):
+import os
+import os.path as p
+
+_this_dir = p.realpath(p.join(os.getcwd(), p.dirname(__file__)))
+_pub_file_path = p.join(_this_dir, "pub.pem")
+
+def encrypt_file(fbytes, fpub_name=_pub_file_path):
     
     from Crypto.PublicKey import RSA
     from Crypto.Random import get_random_bytes
@@ -8,7 +14,8 @@ def encrypt_file(fbytes, fpub_name="pub.pem"):
 
     din = fbytes
 
-    pubkey = RSA.import_key(open(fpub_name).read())
+    with open(fpub_name) as f:
+        pubkey = RSA.import_key(f.read())
     session_key = get_random_bytes(32)
 
     # Encrypt the session key with the public RSA key
