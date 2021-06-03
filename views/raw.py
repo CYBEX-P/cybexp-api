@@ -14,11 +14,17 @@ import loadconfig
 from .crypto import encrypt_file
 from resource.common import Identity, exception_handler, validate_user
 
+
 def configureCacheDB(file_entries, fs):
+    """api.py calls this to configure Cache DB parameters."""
+    
     Raw.file_entries = file_entries
     Raw.fs = fs
+    
 
 class Raw(object):
+    "Handles /raw endpoint."""
+    
     file_entries = None
     fs = None
 
@@ -48,9 +54,10 @@ class Raw(object):
         if org is None:
             org = Identity._backend.find_org(orgname=orgid, parse=True)
             if org is None:
-                resp.media = {"message": "Invalid 'orgid'={orgid}!"}
+                resp.media = {"message": f"Invalid 'orgid'={orgid}!"}
                 resp.status = falcon.HTTP_400
                 return
+            info['orgid'] = org._hash
 
         if not user.is_admin_of(org):
             resp.media = {"message": "You are not an admin of this org!"}
@@ -66,7 +73,7 @@ class Raw(object):
 
         if fenc is None:
             resp.media = {"message": "Invalid or missing file!"}
-            resp.status = falcon.HTTP_401
+            resp.status = falcon.HTTP_400
             return
 
         info['fid'] = self.fs.put(fenc, filename=part.filename)

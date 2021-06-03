@@ -202,6 +202,15 @@ def validate_org(func):
                 return
 
             req.context['org'] = org
+
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        
+        except pymongo.errors.ServerSelectionTimeoutError:
+            logging.exception("Cache DB - Identity Backend down!", exc_info=True)
+            resp.media = {"message": "Authentication database down!"}
+            resp.status = falcon.HTTP_500
+            return
             
         except:
             logging.exception("Error in validate_org", exc_info=True)
@@ -246,7 +255,7 @@ def validate_user(func):
 
             if token_type != "Bearer":
                 resp.media = {"message": "Token must be of type Bearer!"}
-                resp.status = falcon.HTTP_400
+                resp.status = falcon.HTTP_401
                 return
             
             if Identity.is_token_revoked(token):
@@ -259,10 +268,19 @@ def validate_user(func):
 
             if user is None:
                 resp.media = {"message": "User does not exist!"}
-                resp.status = falcon.HTTP_409
+                resp.status = falcon.HTTP_401
                 return
 
             req.context['user'] = user
+
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        
+        except pymongo.errors.ServerSelectionTimeoutError:
+            logging.exception("Cache DB - Identity Backend down!", exc_info=True)
+            resp.media = {"message": "Authentication database down!"}
+            resp.status = falcon.HTTP_500
+            return
             
         except:
             logging.exception("Error in validate_user", exc_info=True)

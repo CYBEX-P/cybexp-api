@@ -201,7 +201,7 @@ class TestValidateToken(BaseTestCase):
         wr_headers = {'authorization': 'Not_bearer ' + token}
         result = self.simulate_get('/test/validate_token', headers=wr_headers)
         EQ = self.assertEqual
-        EQ(result.status_code, 400)
+        EQ(result.status_code, 401)
         EQ(result.json['message'], 'Token must be of type Bearer!')
 
         _LOGGER.disabled = False

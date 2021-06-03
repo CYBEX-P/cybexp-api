@@ -19,20 +19,34 @@ logging.basicConfig(level=logging.ERROR,
 
 
 def configureIDBackend(_id_backend):
-    """Call this function to setup identity backend."""
+    """Configures identity backend."""
+    
     resource.common.configureIDBackend(_id_backend)
 
+
 def configureCacheDB(file_entries, fs):
+    """Configures cache backend."""
+    
     views.raw.configureCacheDB(file_entries, fs)
+
+def configureReportBackend(_report_backend):
+    """Confgiures report backend."""
+
+    views.query.configureReportBackend(_report_backend)
+
 
 
 # Temporary Fix
+# -------------
 
 _id_backend = loadconfig.get_identity_backend()
 configureIDBackend(_id_backend)
 
 file_entries, fs = loadconfig.get_cache_db()
 configureCacheDB(file_entries, fs)
+
+_report_backend = loadconfig.get_report_backend()
+configureReportBackend(_report_backend)
 
 
 
@@ -44,7 +58,6 @@ app = falcon.App()
 
 # Views
 # -----
-
 
 app.add_route('/ping', views.PingPong())
 app.add_route('/query', views.Query())
@@ -76,6 +89,9 @@ if __name__ == '__main__':
 
     file_entries, fs = loadconfig.get_cache_db()
     configureCacheDB(file_entries, fs)
+
+    _report_backend = loadconfig.get_report_backend()
+    configureReportBackend(_report_backend)
     
     from wsgiref import simple_server
     httpd = simple_server.make_server('0.0.0.0', 5000, app)

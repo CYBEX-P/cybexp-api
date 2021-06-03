@@ -17,20 +17,24 @@ if __name__ != 'api.views.query':
 import loadconfig
 
 from .crypto import encrypt_file
-from resource.common import validate_user, tahoe
+from resource.common import tahoe, exception_handler, validate_user
 
 from tahoe import TDQL
 from tahoe.misc import canonical
 
-_BACKEND = loadconfig.get_report_backend()
-TDQL._backend = _BACKEND
+
+def configureReportBackend(_report_backend):
+    """`api.py` calls this to configure report backend."""
+    
+    TDQL._backend = _report_backend
 
 
 # === Query Class ===
 
 class Query(object):
-    report_backend = _BACKEND
+    """Handles /query endpoint."""
 
+    @exception_handler
     @validate_user
     def on_post(self, req, resp):
         try:
@@ -55,7 +59,7 @@ class Query(object):
             query = TDQL(qtype, enc_qdata, qhash, userid)
           
             if not qredo and query.status in ['ready', 'failed']:
-                report = self.report_backend.find_one(
+                report = TDQL._backend.find_one(
                     {'_hash': query.report_id}, {'_id': 0})
                 resp.media = report
                 resp.status = falcon.HTTP_201
@@ -91,9 +95,8 @@ class Query(object):
                 sock.close()
 
             if status == 201:
-                query = self.report_backend.find_one(
-                    {'_hash': query._hash})
-                report = self.report_backend.find_one(
+                query = TDQL._backend.find_one({'_hash': query._hash})
+                report = TDQL._backend.find_one(
                     {'_hash': query['data']['report_id'][0]}, {'_id': 0})
                 resp.media = report
                 resp.status = falcon.HTTP_201
