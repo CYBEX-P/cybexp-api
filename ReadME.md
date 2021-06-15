@@ -7,7 +7,7 @@
 <figure class="image">
   <img src="https://user-images.githubusercontent.com/24872576/122102903-cceb6980-cdca-11eb-980f-cd8e1e0079be.png"     width="400" alt="CYBEX-P System Infrastructure">
   <figcaption>Fig 1. CYBEX-P System Infrastructure</figcaption>
-</figure>
+</figure> \ \
 
 CYBEX-P backend has 5 software modules --
     (1) API
