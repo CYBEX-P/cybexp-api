@@ -27,8 +27,11 @@ for all data into and out of CYBEX-P. It has two sub-modules –
 1. Download & install [Python 3.9.x](https://www.python.org/downloads/).
 
 2. Create and activate Python virtual environment [(official documentation)](https://docs.python.org/3/library/venv.html).
+
 Create: ```python -m venv myenv```
+
 Activate in *Ubuntu*: ```source myenv/bin/activate```
+
 Activate in *Windows*: ```source myenv/Scripts/activate```
 
 3. Download the files from this repository into the server host.
