@@ -10,11 +10,11 @@
 </figure>
 
 CYBEX-P backend has 5 software modules --
-    1. API
-    2. Input
-    3. Archive
-    4. Analytics
-    5. Report
+    (1) API
+    (2) Input
+    (3) Archive
+    (4) Analytics
+    (5) Report
 
 The API module (4, 5 in Fig. 1) consists of the API server (4) and the cache data lake (5). It acts as the gateway
 for all data into and out of CYBEX-P. It has two sub-modules –
@@ -31,7 +31,7 @@ Create: ```python -m venv myenv``` \
 Activate in *Ubuntu*: ```source myenv/bin/activate``` \
 Activate in *Windows*: ```source myenv/Scripts/activate```
 
-3. Download the files from this repository into the server host.
+3. Download the files from this repository into the server host. \
 ```git clone https://github.com/CYBEX-P/cybexp-api.git```
 
 4. Install external dependencies
