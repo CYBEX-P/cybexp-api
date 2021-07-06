@@ -62,29 +62,3 @@ hupper -m api
 curl http://localhost:5000/ping
 ```
 
-
-
-### Deployment on Ubuntu
-
-```bash
-source env/bin/activate
-#install dependency
-pip install uwsgi
-# do not install uwsgi via reposiroty, use pip to install in env
-
-# run api with WSGI protocol, use proxy to hook into it or change socket= to http=
-/path/to/env/bin/uwsgi --init uwsgi.init
-```
-
-# <small> **API Module Installation**</small>
-- Basic Installation:
-	- (example_name) $: `cd <project-dir>/...`
-	- (example_name) $: `git clone https://github.com/CYBEX-P/cybexp-api.git`
-	- (example_name) $: `cd cybexp-api`
-	- (example_name) $:`pip install -r requirements.txt`
-- Unit testing:
-	- (example_name) $:`cd ../cybexp-api`
-	- (example_name) $:`python3.9 -m unittest`
-- Test run the environment:
-	- hupper -m api
-	- curl http://localhost:5000/ping
