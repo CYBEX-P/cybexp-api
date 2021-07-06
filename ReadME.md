@@ -1,7 +1,4 @@
 
-
-
-
 # CYBEX-P API Module
 
 <figure class="image">
@@ -9,7 +6,7 @@
   <figcaption>Fig 1. CYBEX-P System Infrastructure</figcaption>
 </figure>
 
-\
+
 
 CYBEX-P backend has 5 software modules --
     (1) API
@@ -62,3 +59,16 @@ hupper -m api
 curl http://localhost:5000/ping
 ```
 
+
+
+### Deployment on Ubuntu
+
+```bash
+source env/bin/activate
+#install dependency
+pip install uwsgi
+# do not install uwsgi via reposiroty, use pip to install in env
+
+# run api with WSGI protocol, use proxy to hook into it or change socket= to http=
+/path/to/env/bin/uwsgi --init uwsgi.init
+```
