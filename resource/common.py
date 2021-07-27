@@ -76,6 +76,8 @@ def _early_return(resp):
 
 
 def exception_handler(func):
+    """Catches and handles all exceptions."""
+    
     def wrapper(self, req, resp, *args, **kwargs):
         if _early_return(resp):
             return

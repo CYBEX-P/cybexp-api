@@ -1,3 +1,7 @@
+# ========= Config and Runtime Files =============
+config/
+*config.json
+
 # ================ MY Files ================
 *.bat
 *playpen.py
