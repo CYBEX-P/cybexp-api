@@ -41,7 +41,8 @@ default = {
     "identity": {
         "mongo_url": "mongodb://localhost:27017/",
         "db": "identity_db",
-        "coll": "instance"
+        "coll": "instance",
+        "secret": "secret"
     },
     "report": {
         "mongo_url": "mongodb://localhost:27017/",
@@ -329,7 +330,10 @@ def get_identity_backend(filename='config.json'):
     dbname = idenityconfig['db']
     collname = idenityconfig['coll']
     backend = tahoe.identity.IdentityBackend(mongo_url, dbname, collname)
-    return backend
+
+    secret = idenityconfig.get('secret', "secret")
+
+    return backend, secret
 
 
 

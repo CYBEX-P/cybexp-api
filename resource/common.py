@@ -18,7 +18,7 @@ class ResourceBase(object):
     """
 
 
-def configureIDBackend(_backend):
+def configureIDBackend(_backend, secret="secret"):
     """
     `api.py` will call this function to setup identity backend.
 
@@ -37,6 +37,7 @@ def configureIDBackend(_backend):
 
     ResourceBase._backend = _backend
     Identity._backend = _backend
+    Identity.secret = secret
 
 
 def _early_return(resp):

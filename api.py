@@ -18,10 +18,10 @@ logging.basicConfig(level=logging.ERROR,
         ' line %(lineno)s in %(funcName)s \n%(message)s')
 
 
-def configureIDBackend(_id_backend):
+def configureIDBackend(_id_backend, secret="secret"):
     """Configures identity backend."""
     
-    resource.common.configureIDBackend(_id_backend)
+    resource.common.configureIDBackend(_id_backend, secret)
 
 
 def configureCacheDB(file_entries, fs):
@@ -84,8 +84,8 @@ app.add_route('/user/info/self', resource.identity.UserInfoSelf())
 
 if __name__ == '__main__':
 
-    _id_backend = loadconfig.get_identity_backend()
-    configureIDBackend(_id_backend)
+    _id_backend, secret = loadconfig.get_identity_backend()
+    configureIDBackend(_id_backend, secret)
 
     file_entries, fs = loadconfig.get_cache_db()
     configureCacheDB(file_entries, fs)
