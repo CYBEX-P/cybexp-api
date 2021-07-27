@@ -1,6 +1,7 @@
-# ========= Config and Runtime Files =============
+# ========= Config and Key Files =============
 config/
 *config.json
+*.pem
 
 # ================ MY Files ================
 *.bat
